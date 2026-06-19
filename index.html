@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #1B5E20;
+    --green-bright: #2E7D32;
+    --green-light: #66BB6A;
+    --yellow: #FFD600;
+    --yellow-deep: #F9A825;
+    --yellow-pale: #FFF9C4;
+    --dark: #0D1F0D;
+    --charcoal: #122112;
+    --slate: #1A2E1A;
+    --mist: #243824;
+    --gray: #8A9A8A;
+    --white: #F5F8F2;
+    --qbo-green: #2CA01C;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--white);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  #flash-intro {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--dark);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    animation: flashOut 0.5s ease-out 3.2s forwards;
+  }
+  .flash-logo {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(40px, 8vw, 80px);
+    font-weight: 700;
+    color: var(--yellow);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: flashIn 0.8s ease-out 0.3s forwards;
+  }
+  .flash-sub {
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    color: var(--green-light);
+    text-transform: uppercase;
+    font-weight: 600;
+    opacity: 0;
+    animation: flashIn 0.8s ease-out 0.9s forwards;
+  }
+  .flash-bar {
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+    animation: flashBar 2s ease-out 1.2s forwards;
+    max-width: 300px;
+  }
+  @keyframes flashIn { to { opacity: 1; } }
+  @keyframes flashBar { to { width: 300px; } }
+  @keyframes flashOut { to { opacity: 0; pointer-events: none; visibility: hidden; } }
+
+  #particle-canvas {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none; opacity: 0.35;
+  }
+
+  main { position: relative; z-index: 1; }
+
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(46,125,50,0.12) 0%, transparent 70%);
+  }
+  .profile-pic {
+    position: absolute;
+    top: 40px; left: 40px;
+    width: 200px; height: 200x;
+    border-radius: 50%;
+    border: 3px solid var(--yellow);
+    background: var(--charcoal);
+    overflow: hidden;
+    object-fit: cover;
+    box-shadow: 0 8px 32px rgba(255,214,0,0.15);
+    animation: riseIn 1s ease-out 3.4s both;
+    z-index: 10;
+  }
+  .hero-eyebrow {
+    font-size: 12px; letter-spacing: 0.5em;
+    color: var(--yellow); text-transform: uppercase;
+    margin-bottom: 28px; font-weight: 600;
+    animation: riseIn 1s ease-out 3.4s both;
+  }
+  .hero-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(48px, 9vw, 100px);
+    font-weight: 700; line-height: 0.95;
+    color: var(--white);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    animation: riseIn 1s ease-out 3.6s both;
+  }
+  .hero-name span { color: var(--yellow); }
+  .hero-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(14px, 2vw, 17px);
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--green-light); margin-top: 20px;
+    font-weight: 600;
+    animation: riseIn 1s ease-out 3.8s both;
+  }
+  .hero-divider {
+    width: 70px; height: 3px;
+    background: var(--yellow); margin: 36px auto;
+    animation: riseIn 1s ease-out 4s both;
+  }
+  .hero-tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(18px, 3vw, 24px);
+    font-weight: 500; color: var(--gray);
+    max-width: 540px; line-height: 1.5;
+    animation: riseIn 1s ease-out 4.1s both;
+  }
+  .hero-cta {
+    margin-top: 52px;
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+    animation: riseIn 1s ease-out 4.3s both;
+  }
+  .btn-gold {
+    padding: 15px 38px;
+    border: 2px solid var(--yellow);
+    background: transparent; color: var(--yellow);
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px; letter-spacing: 0.2em;
+    text-transform: uppercase; cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s ease; text-decoration: none;
+    position: relative; overflow: hidden;
+  }
+  .btn-gold::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--yellow); transform: translateX(-100%);
+    transition: transform 0.3s ease; z-index: -1;
+  }
+  .btn-gold:hover { color: var(--dark); }
+  .btn-gold:hover::before { transform: translateX(0); }
+
+  @keyframes riseIn { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+  section {
+    padding: 100px 24px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .section-eyebrow {
+    font-size: 11px; letter-spacing: 0.5em;
+    color: var(--yellow); text-transform: uppercase;
+    margin-bottom: 16px; font-weight: 600;
+  }
+  .section-heading {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(36px, 6vw, 62px);
+    font-weight: 600; color: var(--white);
+    line-height: 1.05; margin-bottom: 48px;
+    text-transform: uppercase; letter-spacing: 0.01em;
+  }
+  .section-heading em { color: var(--yellow); font-style: normal; }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1px; background: rgba(46,125,50,0.25);
+    border: 1px solid rgba(46,125,50,0.25);
+  }
+  .skill-card {
+    background: var(--charcoal);
+    padding: 40px 36px; position: relative;
+    overflow: hidden; transition: background 0.4s ease;
+    cursor: default;
+  }
+  .skill-card::before {
+    content: ''; position: absolute;
+    bottom: 0; left: 0; right: 0; height: 3px;
+    background: var(--yellow);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .skill-card:hover { background: var(--slate); }
+  .skill-card:hover::before { transform: scaleX(1); }
+  .skill-icon {
+    font-size: 32px; margin-bottom: 20px;
+    display: block;
+  }
+  .skill-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 24px; font-weight: 600;
+    color: var(--white); margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .skill-desc {
+    font-size: 15px; line-height: 1.7;
+    color: var(--gray); font-weight: 400;
+  }
+  .skill-tags {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 20px;
+  }
+  .tag {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 600;
+    padding: 5px 12px;
+    border: 1px solid rgba(255,214,0,0.4);
+    color: var(--yellow); background: rgba(255,214,0,0.06);
+  }
+
+  .qbo-section {
+    padding: 80px 24px;
+    background: var(--charcoal);
+    text-align: center;
+  }
+  .qbo-inner { max-width: 800px; margin: 0 auto; }
+  .qbo-badges {
+    display: flex; align-items: center; justify-content: center;
+    gap: 32px; flex-wrap: wrap; margin-top: 48px;
+  }
+  .qbo-logo-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px;
+    padding: 28px 36px;
+    border: 1px solid rgba(46,125,50,0.3);
+    background: rgba(255,255,255,0.03);
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: default;
+  }
+  .qbo-logo-wrap:hover {
+    border-color: var(--yellow);
+    transform: translateY(-4px);
+  }
+  .qbo-svg { width: 120px; height: auto; }
+  .qbo-label {
+    font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--green-light);
+    font-weight: 600;
+  }
+  .tools-grid {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    justify-content: center; margin-top: 40px;
+  }
+  .tool-pill {
+    padding: 11px 24px;
+    border: 1px solid rgba(46,125,50,0.3);
+    color: var(--gray); font-size: 12px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+  .tool-pill:hover {
+    border-color: var(--yellow);
+    color: var(--yellow);
+  }
+
+  .slideshow-section {
+    padding: 100px 24px;
+    background: linear-gradient(180deg, var(--dark) 0%, var(--charcoal) 50%, var(--dark) 100%);
+  }
+  .slideshow-inner { max-width: 1100px; margin: 0 auto; }
+  .slideshow-container {
+    position: relative; overflow: hidden;
+    border: 1px solid rgba(46,125,50,0.3);
+    background: var(--slate);
+    margin-top: 48px;
+  }
+  .slides-track {
+    display: flex;
+    transition: transform 0.7s cubic-bezier(0.77, 0, 0.18, 1);
+  }
+  .slide {
+    min-width: 100%; position: relative;
+    min-height: 420px;
+    display: flex; align-items: center;
+  }
+  .slide-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    filter: brightness(0.35);
+    transition: filter 0.7s ease;
+  }
+  .slide.active .slide-bg { filter: brightness(0.4); }
+  .slide-content {
+    position: relative; z-index: 1;
+    padding: 60px; max-width: 620px;
+  }
+  .slide-num {
+    font-size: 11px; letter-spacing: 0.4em;
+    color: var(--yellow); text-transform: uppercase;
+    margin-bottom: 20px; font-weight: 600;
+  }
+  .slide-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(30px, 4vw, 46px);
+    font-weight: 600; color: var(--white);
+    line-height: 1.1; margin-bottom: 16px;
+    text-transform: uppercase; letter-spacing: 0.01em;
+  }
+  .slide-body {
+    font-size: 15px; line-height: 1.7;
+    color: rgba(245,248,242,0.75); font-weight: 400;
+  }
+  .slide-badge {
+    display: inline-block; margin-top: 24px;
+    padding: 7px 20px; font-size: 10px;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    border: 1px solid var(--yellow); color: var(--yellow);
+    font-weight: 600;
+  }
+
+  .slide-controls {
+    display: flex; align-items: center;
+    justify-content: space-between; padding: 20px 32px;
+    border-top: 1px solid rgba(46,125,50,0.25);
+    background: rgba(13,31,13,0.6);
+  }
+  .slide-dots { display: flex; gap: 10px; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,214,0,0.3);
+    cursor: pointer; transition: all 0.3s;
+    border: 1px solid transparent;
+  }
+  .dot.active {
+    background: var(--yellow); width: 20px; border-radius: 3px;
+  }
+  .slide-arrows { display: flex; gap: 12px; }
+  .arrow-btn {
+    width: 40px; height: 40px;
+    border: 1px solid rgba(255,214,0,0.4);
+    background: transparent; color: var(--yellow);
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+  }
+  .arrow-btn:hover {
+    background: var(--yellow); color: var(--dark);
+  }
+
+  .upload-section {
+    padding: 100px 24px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px; margin-top: 48px;
+  }
+  @media (max-width: 700px) { .upload-grid { grid-template-columns: 1fr; } }
+
+  .drop-zone {
+    border: 2px dashed rgba(46,125,50,0.5);
+    background: rgba(46,125,50,0.03);
+    padding: 48px 24px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; cursor: pointer;
+    transition: all 0.3s; position: relative;
+    min-height: 280px;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--yellow);
+    background: rgba(255,214,0,0.05);
+  }
+  .drop-zone input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-icon { font-size: 36px; opacity: 0.6; }
+  .drop-text {
+    font-size: 14px; color: var(--gray);
+    text-align: center; line-height: 1.6; font-weight: 500;
+  }
+  .drop-text strong { color: var(--yellow); display: block; font-weight: 700; }
+
+  .image-controls {
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .ctrl-label {
+    font-size: 11px; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--yellow);
+    margin-bottom: 8px; display: block; font-weight: 600;
+  }
+  .ctrl-slider {
+    width: 100%; -webkit-appearance: none;
+    height: 3px; background: rgba(46,125,50,0.3);
+    outline: none; border-radius: 1px;
+  }
+  .ctrl-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--yellow); cursor: pointer;
+    border: 2px solid var(--dark);
+  }
+  .ctrl-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px; color: var(--yellow);
+    text-align: right; margin-top: 4px; font-weight: 600;
+  }
+  .upload-preview-wrap {
+    grid-column: 1 / -1;
+    border: 1px solid rgba(46,125,50,0.25);
+    padding: 24px; background: var(--charcoal);
+    display: none;
+    min-height: 200px; position: relative;
+    overflow: hidden;
+  }
+  .upload-preview-wrap.visible { display: flex; align-items: center; justify-content: center; }
+  #preview-img {
+    max-width: 100%; max-height: 400px;
+    object-fit: contain; transition: all 0.5s ease;
+    display: block;
+  }
+  .pact-btn {
+    padding: 9px 16px; font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    border: 1px solid rgba(255,214,0,0.4);
+    background: var(--charcoal); color: var(--yellow);
+    cursor: pointer; transition: all 0.2s; font-weight: 600;
+  }
+  .pact-btn:hover { background: var(--yellow); color: var(--dark); }
+
+  .stats-bar {
+    border-top: 1px solid rgba(46,125,50,0.25);
+    border-bottom: 1px solid rgba(46,125,50,0.25);
+    background: var(--charcoal); padding: 0 24px;
+  }
+  .stats-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .stat-item {
+    padding: 48px 24px; text-align: center;
+    border-right: 1px solid rgba(46,125,50,0.2);
+    position: relative; overflow: hidden;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 58px; font-weight: 700;
+    color: var(--yellow); line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-size: 10px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--green-light);
+    margin-top: 8px; display: block; font-weight: 600;
+  }
+
+  .contact-section {
+    padding: 100px 24px;
+    background: var(--charcoal);
+    text-align: center;
+  }
+  .contact-inner { max-width: 600px; margin: 0 auto; }
+  .contact-email {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(16px, 3vw, 26px);
+    color: var(--yellow); margin: 32px 0;
+    font-weight: 500; letter-spacing: 0.03em;
+    text-decoration: none; display: inline-block;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s;
+    word-break: break-all;
+  }
+  .contact-email:hover { border-color: var(--yellow); }
+
+  footer {
+    padding: 32px 24px;
+    border-top: 1px solid rgba(46,125,50,0.25);
+    text-align: center;
+  }
+  .footer-text {
+    font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--gray);
+    font-weight: 500;
+  }
+  .footer-text span { color: var(--yellow); }
+
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @keyframes goldPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,214,0,0); }
+    50% { box-shadow: 0 0 24px 4px rgba(255,214,0,0.3); }
+  }
+  .skill-card.pulse { animation: goldPulse 1.5s ease; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--yellow); }
+
+  @media (max-width: 600px) {
+    .profile-pic { top: 30px; left: 30px; width: 180px; height: 180px; }
+    .slide-content { padding: 32px 24px; }
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    .stat-item:nth-child(2) { border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── FLASH INTRO ─── -->
+<div id="flash-intro">
+  <div class="flash-logo">My Portfolio</div>
+  <div class="flash-sub">Bookkeeping · Auditing · Automation</div>
+  <div class="flash-bar"></div>
+</div>
+
+<!-- ─── PARTICLE CANVAS ─── -->
+<canvas id="particle-canvas"></canvas>
+
+<main>
+
+  <!-- ─── HERO ─── -->
+  <div class="hero">
+    <img src="https://drive.google.com/thumbnail?id=1xD3zU5EAHWBNKqsr8kvyMkQl6Q_EzUaF&sz=w1000" alt="Mark Steven M. Pacina" class="profile-pic" id="profilePic" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://lh3.googleusercontent.com/d/1xD3zU5EAHWBNKqsr8kvyMkQl6Q_EzUaF=w1000';">
+    <p class="hero-eyebrow">Financial Professional</p>
+    <h1 class="hero-name">Mark Steven<br><span>M. Pacina</span></h1>
+    <p class="hero-title">Bookkeeping · Auditing · Financial Automation</p>
+    <div class="hero-divider"></div>
+    <p class="hero-tagline">"Where precision meets power — turning complex numbers into clear financial clarity."</p>
+    <div class="hero-cta">
+      <a href="#skills" class="btn-gold">View Expertise</a>
+      <a href="#contact" class="btn-gold">Engage Services</a>
+    </div>
+  </div>
+
+  <!-- ─── STATS BAR ─── -->
+  <div class="stats-bar reveal">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <span class="stat-num" data-target="4">0</span>
+        <span class="stat-label">Years of Excellence</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="4">0</span>
+        <span class="stat-label">Companies Served</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="95">0</span>
+        <span class="stat-label">Accuracy Rate %</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="3">0</span>
+        <span class="stat-label">Automation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SKILLS ─── -->
+  <section id="skills">
+    <p class="section-eyebrow reveal">Core Competencies</p>
+    <h2 class="section-heading reveal">Exceptional <em>Expertise</em></h2>
+    <div class="skills-grid reveal">
+
+      <div class="skill-card" onmouseenter="this.classList.add('pulse')">
+        <span class="skill-icon">📒</span>
+        <h3 class="skill-name">Precision Bookkeeping</h3>
+        <p class="skill-desc">Full-cycle bookkeeping from chart of accounts to financial statements. Bank reconciliation, AP/AR management, and real-time cash flow tracking that gives you complete financial visibility.</p>
+        <div class="skill-tags">
+          <span class="tag">Chart of Accounts</span>
+          <span class="tag">Bank Rec</span>
+          <span class="tag">Cash Flow</span>
+          <span class="tag">AP/AR</span>
+        </div>
+      </div>
+
+      <div class="skill-card" onmouseenter="this.classList.add('pulse')">
+        <span class="skill-icon">🔍</span>
+        <h3 class="skill-name">Financial Auditing</h3>
+        <p class="skill-desc">Comprehensive internal and external audit support. Transaction-level review, variance analysis, compliance verification, and fraud detection — ensuring your books are airtight and audit-ready.</p>
+        <div class="skill-tags">
+          <span class="tag">Internal Audit</span>
+          <span class="tag">Compliance</span>
+          <span class="tag">Variance Analysis</span>
+          <span class="tag">Fraud Detection</span>
+        </div>
+      </div>
+
+      <div class="skill-card" onmouseenter="this.classList.add('pulse')">
+        <span class="skill-icon">⚡</span>
+        <h3 class="skill-name">Financial Automation</h3>
+        <p class="skill-desc">Google Apps Script workflows, QuickBooks automation, and Sheets-based dashboards that eliminate manual entry. Custom triggers, automated reconciliations, and scheduled reports that run while you sleep.</p>
+        <div class="skill-tags">
+          <span class="tag">Google Apps Script</span>
+          <span class="tag">QBO API</span>
+          <span class="tag">Dashboards</span>
+          <span class="tag">Auto-Reports</span>
+        </div>
+      </div>
+
+      <div class="skill-card" onmouseenter="this.classList.add('pulse')">
+        <span class="skill-icon">📊</span>
+        <h3 class="skill-name">Reporting & Analytics</h3>
+        <p class="skill-desc">Executive-ready financial reports: P&L statements, balance sheets, and cash flow forecasts. Custom KPI dashboards in Google Sheets with automated data pulls and interactive visualizations.</p>
+        <div class="skill-tags">
+          <span class="tag">P&L Statements</span>
+          <span class="tag">KPI Dashboards</span>
+          <span class="tag">Forecasting</span>
+          <span class="tag">Balance Sheet</span>
+        </div>
+      </div>
+
+      <div class="skill-card" onmouseenter="this.classList.add('pulse')">
+        <span class="skill-icon">🏦</span>
+        <h3 class="skill-name">Payroll Management</h3>
+        <p class="skill-desc">End-to-end payroll processing with compliance to local tax codes. SSS, PhilHealth, Pag-IBIG contributions, 13th month computation, and fully automated payslip generation via Google Workspace.</p>
+        <div class="skill-tags">
+          <span class="tag">Payroll</span>
+          <span class="tag">Tax Compliance</span>
+          <span class="tag">SSS/PhilHealth</span>
+          <span class="tag">Auto Payslips</span>
+        </div>
+      </div>
+
+      <div class="skill-card" onmouseenter="this.classList.add('pulse')">
+        <span class="skill-icon">🔗</span>
+        <h3 class="skill-name">System Integration</h3>
+        <p class="skill-desc">Seamless integration between QuickBooks Online, Google Sheets, Gmail, and Drive. Multi-system data pipelines that keep your financial data synchronized, backed up, and always accessible.</p>
+        <div class="skill-tags">
+          <span class="tag">QBO Integration</span>
+          <span class="tag">Google Drive</span>
+          <span class="tag">API Connections</span>
+          <span class="tag">Data Sync</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── QBO SECTION ─── -->
+  <div class="qbo-section">
+    <div class="qbo-inner">
+      <p class="section-eyebrow reveal" style="text-align:center;">Trusted Software Expertise</p>
+      <h2 class="section-heading reveal" style="text-align:center; max-width: 540px; margin-left: auto; margin-right: auto;">Certified in <em>Leading Platforms</em></h2>
+      <div class="qbo-badges reveal">
+
+        <div class="qbo-logo-wrap">
+          <svg class="qbo-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="qbg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#2CA01C;stop-opacity:1"/>
+                <stop offset="100%" style="stop-color:#1A7A10;stop-opacity:1"/>
+              </linearGradient>
+            </defs>
+            <circle cx="28" cy="30" r="22" fill="url(#qbg1)"/>
+            <text x="28" y="38" text-anchor="middle" font-family="Arial Black, sans-serif"
+              font-weight="900" font-size="26" fill="white">Q</text>
+            <text x="60" y="24" font-family="Arial, sans-serif" font-weight="700"
+              font-size="14" fill="#2CA01C">QuickBooks</text>
+            <text x="60" y="42" font-family="Arial, sans-serif" font-weight="400"
+              font-size="12" fill="#1B5E20">Online</text>
+            <rect x="60" y="46" width="70" height="10" rx="2" fill="#FFD600" opacity="0.95"/>
+            <text x="95" y="54" text-anchor="middle" font-family="Arial, sans-serif"
+              font-weight="700" font-size="7" fill="#0D1F0D">CERTIFIED ADVISOR</text>
+          </svg>
+          <span class="qbo-label">QuickBooks Online</span>
+        </div>
+
+        <div class="qbo-logo-wrap">
+          <svg class="qbo-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="28" cy="30" r="22" fill="#2E7D32"/>
+            <text x="28" y="38" text-anchor="middle" font-family="Arial, sans-serif"
+              font-weight="900" font-size="22" fill="white">G</text>
+            <text x="62" y="27" font-family="Arial, sans-serif" font-weight="700"
+              font-size="13" fill="#2E7D32">Google</text>
+            <text x="62" y="43" font-family="Arial, sans-serif" font-weight="400"
+              font-size="12" fill="#5F6368">Workspace</text>
+            <rect x="62" y="46" width="74" height="10" rx="2" fill="#FFD600" opacity="0.95"/>
+            <text x="99" y="54" text-anchor="middle" font-family="Arial, sans-serif"
+              font-weight="700" font-size="7" fill="#0D1F0D">APPS SCRIPT PRO</text>
+          </svg>
+          <span class="qbo-label">Google Workspace</span>
+        </div>
+
+        <div class="qbo-logo-wrap">
+          <svg class="qbo-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="8" width="44" height="44" rx="6" fill="#1B5E20"/>
+            <text x="28" y="38" text-anchor="middle" font-family="Arial Black, sans-serif"
+              font-weight="900" font-size="28" fill="white">X</text>
+            <text x="60" y="27" font-family="Arial, sans-serif" font-weight="700"
+              font-size="13" fill="#1B5E20">Microsoft</text>
+            <text x="60" y="43" font-family="Arial, sans-serif" font-weight="400"
+              font-size="12" fill="#5F6368">Excel Expert</text>
+            <rect x="60" y="46" width="68" height="10" rx="2" fill="#FFD600" opacity="0.95"/>
+            <text x="94" y="54" text-anchor="middle" font-family="Arial, sans-serif"
+              font-weight="700" font-size="7" fill="#0D1F0D">ADVANCED LEVEL</text>
+          </svg>
+          <span class="qbo-label">Microsoft Excel</span>
+        </div>
+
+      </div>
+
+      <div class="tools-grid reveal" style="margin-top: 48px;">
+        <span class="tool-pill">QuickBooks Online</span>
+        <span class="tool-pill">Google Apps Script</span>
+        <span class="tool-pill">Google Sheets</span>
+        <span class="tool-pill">Microsoft Excel</span>
+
+        <span class="tool-pill">Google Drive</span>
+        <span class="tool-pill">Gmail Automation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SLIDESHOW ─── -->
+  <div class="slideshow-section">
+    <div class="slideshow-inner">
+      <p class="section-eyebrow reveal" style="text-align:center;">Portfolio Highlights</p>
+      <h2 class="section-heading reveal" style="text-align:center;">CORE<em>SKILLS</em></h2>
+
+      <div class="slideshow-container reveal">
+        <div class="slides-track" id="slidesTrack">
+
+          <div class="slide active">
+            <div class="slide-bg" style="background: linear-gradient(135deg, #0D1F0D 0%, #1a2e1a 50%, #0D1F0D 100%);"></div>
+            <div class="slide-content">
+              <p class="slide-num">CS — 01</p>
+              <h3 class="slide-title">Full-Cycle Bookkeeping</h3>
+              <p class="slide-body">Restructured the chart of accounts, Reconciled 3 years of historical data on QuickBooks Online, and deployed automated bank-feed rules</p>
+              <span class="slide-badge">Bookkeeping · QBO · Automation</span>
+            </div>
+          </div>
+
+          <div class="slide">
+            <div class="slide-bg" style="background: linear-gradient(135deg, #0f1f0a 0%, #1e2e1a 50%, #0D1F0D 100%);"></div>
+            <div class="slide-content">
+              <p class="slide-num">CS — 02</p>
+              <h3 class="slide-title">Internal Audit System</h3>
+              <p class="slide-body">Designed and executed a quarterly internal audit framework covering inventory valuation, procurement compliance, and payroll accuracy.</p>
+              <span class="slide-badge">Auditing · Compliance · Fraud Detection</span>
+            </div>
+          </div>
+
+          <div class="slide">
+            <div class="slide-bg" style="background: linear-gradient(135deg, #0a1f0a 0%, #1a2e1a 50%, #0D1F0D 100%);"></div>
+            <div class="slide-content">
+              <p class="slide-num">CS — 03</p>
+              <h3 class="slide-title">Google Apps Script Automation</h3>
+              <p class="slide-body">Built a fully automated financial reporting system in Google Workspace — daily P&L pulls from QBO API, Sheets-based dashboards with conditional alerts.</p>
+              <span class="slide-badge">Automation · Apps Script · QBO API</span>
+            </div>
+          </div>
+
+          <div class="slide">
+            <div class="slide-bg" style="background: linear-gradient(135deg, #1f1f0a 0%, #2e2e1a 50%, #0D1F0D 100%);"></div>
+            <div class="slide-content">
+              <p class="slide-num">CS — 04</p>
+              <h3 class="slide-title">Payroll Automation for a 250+ Employee</h3>
+              <p class="slide-body">Engineered a Google Sheets payroll engine with automated government contribution calculations (SSS, PhilHealth, Pag-IBIG), tax table withholding, and individual payslip generation — all triggered by a single click.</p>
+              <span class="slide-badge">Payroll · Tax Compliance · Automation</span>
+            </div>
+          </div>
+
+          <div class="slide">
+            <div class="slide-bg" style="background: linear-gradient(135deg, #0D1F0D 0%, #1a2e1e 50%, #0D1F0D 100%);"></div>
+            <div class="slide-content">
+              <p class="slide-num">CS — 05</p>
+              <h3 class="slide-title">Company Consolidation Dashboard</h3>
+              <p class="slide-body">Developed a real-time financial consolidation tool for a company with live data from multiple QBO accounts into a single Google Sheets master dashboard with drill-down capability.</p>
+              <span class="slide-badge">Consolidation · Multi-Entity · Reporting</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="slide-controls">
+          <div class="slide-dots" id="slideDots">
+            <div class="dot active" onclick="goToSlide(0)"></div>
+            <div class="dot" onclick="goToSlide(1)"></div>
+            <div class="dot" onclick="goToSlide(2)"></div>
+            <div class="dot" onclick="goToSlide(3)"></div>
+            <div class="dot" onclick="goToSlide(4)"></div>
+          </div>
+          <div class="slide-arrows">
+            <button class="arrow-btn" onclick="changeSlide(-1)" aria-label="Previous">&#8592;</button>
+            <button class="arrow-btn" onclick="changeSlide(1)" aria-label="Next">&#8594;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── CONTACT ─── -->
+  <div class="contact-section" id="contact">
+    <div class="contact-inner">
+      <p class="section-eyebrow reveal" style="text-align:center;">Let's Work Together</p>
+      <h2 class="section-heading reveal" style="text-align:center; max-width:440px; margin:0 auto 0;">Ready to <em>Elevate</em> Your Finances?</h2>
+      <p class="reveal" style="color: var(--gray); font-size: 15px; line-height: 1.7; margin-top:24px; font-weight: 500;">
+        Whether you need a bookkeeping clean-up, a deep audit, or a fully automated financial system built on Google Workspace — let's talk.
+      </p>
+      <a href="mailto:markstevenpacina1997@gmail.com" class="contact-email reveal">markstevenpacina1997@gmail.com</a>
+      <div class="reveal" style="margin-top:8px;">
+        <a href="#" class="btn-gold">Schedule a Consultation</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <p class="footer-text">© 2025 <span>Mark Steven M. Pacina</span> · My Portfolio · Built on Google Workspace</p>
+  </footer>
+
+</main>
+
+<script>
+/* ─── PARTICLES ─── */
+(function(){
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  for(let i=0; i<60; i++){
+    particles.push({
+      x: Math.random()*1920, y: Math.random()*1080,
+      r: Math.random()*1.5+0.3,
+      vx: (Math.random()-0.5)*0.15,
+      vy: (Math.random()-0.5)*0.15,
+      a: Math.random()*0.6+0.1,
+      c: Math.random() > 0.5 ? '255,214,0' : '102,187,106'
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x%W, p.y%H, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${p.c},${p.a})`;
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<0) p.x=W; if(p.x>W) p.x=0;
+      if(p.y<0) p.y=H; if(p.y>H) p.y=0;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─── REVEAL ON SCROLL ─── */
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('visible'); }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* ─── STAT COUNTER ─── */
+function animateCount(el, target){
+  let cur = 0;
+  const step = target / 60;
+  const timer = setInterval(()=>{
+    cur = Math.min(cur+step, target);
+    el.textContent = (target === 98 ? Math.round(cur)+'%' : Math.round(cur));
+    if(cur >= target) clearInterval(timer);
+  }, 24);
+}
+const statObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('[data-target]').forEach(el=>{
+        animateCount(el, parseInt(el.dataset.target));
+      });
+      statObserver.disconnect();
+    }
+  });
+},{threshold:0.3});
+const statsBar = document.querySelector('.stats-bar');
+if(statsBar) statObserver.observe(statsBar);
+
+/* ─── SLIDESHOW ─── */
+let currentSlide = 0;
+const totalSlides = 5;
+let autoTimer;
+
+function goToSlide(n){
+  currentSlide = (n + totalSlides) % totalSlides;
+  document.getElementById('slidesTrack').style.transform = `translateX(-${currentSlide*100}%)`;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active', i===currentSlide));
+}
+function changeSlide(dir){ goToSlide(currentSlide + dir); resetAuto(); }
+function resetAuto(){
+  clearInterval(autoTimer);
+  autoTimer = setInterval(()=>goToSlide(currentSlide+1), 5000);
+}
+resetAuto();
+
+/* ─── IMAGE UPLOAD & CONTROLS ─── */
+function handleFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById('preview-img');
+    img.src = ev.target.result;
+    document.getElementById('previewWrap').classList.add('visible');
+    document.getElementById('imgControls').style.opacity = '1';
+    document.getElementById('imgControls').style.pointerEvents = 'all';
+    applyTransform();
+  };
+  reader.readAsDataURL(file);
+}
+
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', ()=>dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e=>{
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if(f && f.type.startsWith('image/')){
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.getElementById('preview-img');
+      img.src = ev.target.result;
+      document.getElementById('previewWrap').classList.add('visible');
+      document.getElementById('imgControls').style.opacity = '1';
+      document.getElementById('imgControls').style.pointerEvents = 'all';
+      applyTransform();
+    };
+    reader.readAsDataURL(f);
+  }
+});
+
+function applyTransform(){
+  const img = document.getElementById('preview-img');
+  const s = document.getElementById('scaleSlider').value;
+  const b = document.getElementById('brightSlider').value;
+  const o = document.getElementById('opacSlider').value;
+  img.style.transform = `scale(${s/100})`;
+  img.style.filter = `brightness(${b/100})`;
+  img.style.opacity = o/100;
+  document.getElementById('scaleVal').textContent = s+'%';
+  document.getElementById('brightVal').textContent = b+'%';
+  document.getElementById('opacVal').textContent = o+'%';
+}
+
+function flashImage(){
+  const img = document.getElementById('preview-img');
+  let count = 0;
+  const t = setInterval(()=>{
+    img.style.opacity = count%2===0 ? 0.1 : 1;
+    count++;
+    if(count > 6){ clearInterval(t); img.style.opacity = document.getElementById('opacSlider').value/100; }
+  }, 120);
+}
+
+function clearImage(){
+  document.getElementById('preview-img').src = '';
+  document.getElementById('previewWrap').classList.remove('visible');
+  document.getElementById('imgControls').style.opacity = '0.4';
+  document.getElementById('imgControls').style.pointerEvents = 'none';
+  document.getElementById('scaleSlider').value = 100;
+  document.getElementById('brightSlider').value = 100;
+  document.getElementById('opacSlider').value = 100;
+  document.getElementById('scaleVal').textContent = '100%';
+  document.getElementById('brightVal').textContent = '100%';
+  document.getElementById('opacVal').textContent = '100%';
+  document.getElementById('fileInput').value = '';
+}
+
+function downloadImage(){
+  const img = document.getElementById('preview-img');
+  if(!img.src || img.src==='') return;
+  const a = document.createElement('a');
+  a.href = img.src;
+  a.download = 'portfolio-image.png';
+  a.click();
+}
+
+/* ─── SKILL CARD PULSE CLEANUP ─── */
+document.querySelectorAll('.skill-card').forEach(card=>{
+  card.addEventListener('animationend', ()=>card.classList.remove('pulse'));
+});
+</script>
+</body>
+</html>
